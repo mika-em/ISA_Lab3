@@ -16,13 +16,10 @@ http.createServer(function (req, res) {
 
     if (myURL.searchParams.has("text")) {
         const text = myURL.searchParams.get("text");
-        fs.appendFile(path, `${text}\n`, function (err) {
+        fs.appendFileSync(path, `${text}\n`, function (err) {
             if (err) {
                 handleError(res, '500', err.message)
             } else {
-                if (!fs.existsSync(path)) {
-                    fs.writeFileSync(path, "");
-                }
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 })
@@ -31,18 +28,24 @@ http.createServer(function (req, res) {
             res.end();
         })
     } else if (myURL.pathname === ("/read")) {
-        fs.readFile(path, function (err, text) {
-            const formattedText = formatTextFile(text)
-            if (err) {
-                handleError(res, '500', err.message)
-            } else {
+        try {
+            if (fs.existsSync(path)) {
+                const text = fs.readFileSync(path, 'utf-8');
+                const formattedText = formatTextFile(text);
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 });
                 res.write(formattedText);
-                return res.end();
+            } else {
+                res.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
+                res.write("File does not exist yet. Add some text first.");
             }
-        })
+        } catch (err) {
+            handleError(res, '500', err.message);
+        }
+        res.end();
     } else {
         res.writeHead(200, {
             'Content-Type': 'text/html'
