@@ -8,6 +8,7 @@ const {
 } = require('./modules/utils.js');
 const path = require('path');
 const port = process.env.PORT || 3000;
+const fs = require('fs');
 let myPath = path.join(__dirname, 'file.txt');
 
 //Write
