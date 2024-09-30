@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000;
 
 http.createServer(function (req, res) {
     const myURL = new URL(req.url, `http://${req.headers.host}`)
-    const name = myURL.searchParams.get("name");
+    const name = myURL.searchParams.get("name") || " ";
     const newMsg = message.replace("%1", name);
     const date = getDate();
     const response = `<div style="color: blue"> ${newMsg} ${date} </div>`;
