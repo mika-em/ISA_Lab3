@@ -33,15 +33,15 @@ http.createServer(async function (req, res) {
         res.end();
 
     } else if (myURL.pathname.startsWith("/read/")) {
-        const fileName = path.basename(pathname);
-        const possibleFilePath = path.join(__dirname, fileName);
+        const requestedFileName = path.basename(pathname);
+        const requestedFilePath = path.join(__dirname, requestedFileName);
         try {
-            if (!fs.existsSync(possibleFilePath)) {
+            if (!fs.existsSync(requestedFilePath)) {
                 return res.writeHead(404, {
                     'Content-Type': 'text/html'
-                }).end(` ${fileName} does not exist or is not found`);
+                }).end(` ${requestedFileName} does not exist or is not found`);
             }
-            const text = fs.readFileSync(possibleFilePath, 'utf-8');
+            const text = fs.readFileSync(requestedFilePath, 'utf-8');
                 const formattedText = formatTextFile(text);
             res.writeHead(200, {
                 'Content-Type': 'text/html'
