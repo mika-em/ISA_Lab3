@@ -7,31 +7,33 @@ const {
     formatTextFile
 } = require('./modules/utils.js');
 const path = require('path');
-let path = path.join(__dirname, 'file.txt');
+let myPath = path.join(__dirname, 'file.txt');
 
 //Write
 http.createServer(async function (req, res) {
     const myURL = new URL(req.url, `http://${req.headers.host}`);
+
     if (myURL.searchParams.has("text")) {
         const text = myURL.searchParams.get("text");
         try {
-            if (!fs.existsSync(repoFilePath)) {
+            if (!fs.existsSync(myPath)) {
                 return res.writeHead(404, {
                     'Content-Type': 'text/html'
                 }).end("File not found");
             }
 
-            fs.appendFileSync(path, text);
+            fs.appendFileSync(myPath, text);
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
 
-            res.write(`File updated. "${text}" appended to file.`);
+            res.write(`File updated. "${text}" appended to file ${myPath}.`);
         } catch (err) {
             handleError(res, '500', err.message);
         }
         res.end();
 
+//Read
     } else if (myURL.pathname.startsWith("/read/")) {
         const requestedFileName = path.basename(pathname);
         const requestedFilePath = path.join(__dirname, requestedFileName);
