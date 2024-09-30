@@ -42,7 +42,7 @@ http.createServer(async function (req, res) {
                 }).end(` ${requestedFileName} does not exist or is not found`);
             }
             const text = fs.readFileSync(requestedFilePath, 'utf-8');
-                const formattedText = formatTextFile(text);
+            const formattedText = formatTextFile(text);
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
@@ -64,6 +64,14 @@ http.createServer(async function (req, res) {
                 <button type="submit">Submit</button>
             </form>
             <br>
+
+            <h2>Enter the file you want to find:</h2>
+            <form action="/read" method="GET">
+                <label for="text">File to search (make sure to include the extension):</label>
+                <input type="text" id="file" name="file" required>
+                <button type="submit">Submit</button>
+            </form>
+
             <p>Or use the following endpoints:</p>
             <ul>
                 <li><strong>/?text=YourTextHere</strong>: Appends the specified text to the file <code>file.txt</code>.</li>
