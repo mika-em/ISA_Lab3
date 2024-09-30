@@ -11,7 +11,7 @@ const {
 const port = process.env.PORT || 3000;
 
 http.createServer(function (req, res) {
-    const myURL = new URL(req.url, `https://${req.headers.host}`)
+    const myURL = new URL(req.url, `http://${req.headers.host}`)
     const name = myURL.searchParams.get("name");
     const newMsg = message.replace("%1", name);
     const date = getDate();
