@@ -1,39 +1,69 @@
 const http = require('http');
 const { URL } = require('url');
 const { handleError, formatTextFile } = require('./modules/utils.js');
-const fs = require('fs');
+
+// Import Firebase dependencies
+const { initializeApp } = require('firebase/app');
+const { getDatabase, ref, get, set, update, child } = require('firebase/database');
+
+// Firebase configuration (replace these values with your own Firebase config)
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
+
+// Initialize Firebase app and database
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
 const port = process.env.PORT || 3000;
-const path = "/tmp/text.txt"; // Ensure compatibility with Vercel
 
-http.createServer(function (req, res) {
-    // Use http in URL, not https (for local servers)
+// Firebase path to store the file content (using `file.txt` as a node in the database)
+const filePath = 'file.txt';
+
+http.createServer(async function (req, res) {
     const myURL = new URL(req.url, `http://${req.headers.host}`);
 
     // Check if the request has the "text" query parameter
     if (myURL.searchParams.has("text")) {
         const text = myURL.searchParams.get("text");
         try {
-            // Append text to the file using fs.appendFileSync
-            fs.appendFileSync(path, `${text}\n`);
+            // Read the current content from Firebase
+            const fileRef = ref(database, filePath);
+            const snapshot = await get(fileRef);
+            let currentContent = snapshot.exists() ? snapshot.val() : '';
+
+            // Append the new text to the existing content
+            const newContent = `${currentContent}\n${text}`;
+            
+            // Write the updated content back to Firebase
+            await set(fileRef, newContent);
+
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.write(`File updated. "${text}" appended to file.`);
         } catch (err) {
-            // Handle errors using the handleError function
             handleError(res, '500', err.message);
         }
         res.end();
 
-    // Check if the pathname is "/read" and try to read the file
+    // Check if the pathname is "/read" and try to read the content from Firebase
     } else if (myURL.pathname === "/read") {
         try {
-            if (fs.existsSync(path)) {
-                const text = fs.readFileSync(path, 'utf-8');
+            const fileRef = ref(database, filePath);
+            const snapshot = await get(fileRef);
+
+            if (snapshot.exists()) {
+                const text = snapshot.val();
                 const formattedText = formatTextFile(text);
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.write(formattedText);
             } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.writeHead(404, { 'Content-Type': 'text/html' });
                 res.write("File does not exist yet. Add some text first.");
             }
         } catch (err) {
@@ -41,6 +71,7 @@ http.createServer(function (req, res) {
         }
         res.end();
 
+    // Default response for the root path or other paths without parameters
     } else {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.write(`
@@ -53,8 +84,8 @@ http.createServer(function (req, res) {
             <br>
             <p>Or use the following endpoints:</p>
             <ul>
-                <li><strong>/?text=YourTextHere</strong>: Appends the specified text to the file <code>text.txt</code>.</li>
-                <li><strong><a href="/read">/read</a></strong>: Reads the contents of the file <code>text.txt</code> and displays it on the screen.</li>
+                <li><strong>/?text=YourTextHere</strong>: Appends the specified text to the file <code>file.txt</code>.</li>
+                <li><strong><a href="/read">/read</a></strong>: Reads the contents of the file <code>file.txt</code> and displays it on the screen.</li>
             </ul>
         `);
         res.end();
