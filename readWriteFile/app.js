@@ -61,7 +61,7 @@ http.createServer(async function (req, res) {
             'Content-Type': 'text/html'
         });
         res.write(`
-            <h2>Enter Text to Add to the File</h2>
+            <h2>Enter text to add to file.txt</h2>
             <form action="/" method="GET">
                 <label for="text">Text to Add:</label>
                 <input type="text" id="text" name="text" required>
@@ -69,17 +69,18 @@ http.createServer(async function (req, res) {
             </form>
             <br>
 
-            <h2>Enter the file you want to find:</h2>
+            <h2>Enter the file you want to find</h2>
             <form action="/read" method="GET">
                 <label for="text">File to search (make sure to include the extension):</label>
                 <input type="text" id="file" name="file" required>
                 <button type="submit">Submit</button>
             </form>
+            <br>
 
             <p>Or use the following endpoints:</p>
             <ul>
                 <li><strong>/?text=YourTextHere</strong>: Appends the specified text to the file <code>file.txt</code>.</li>
-                <li><strong><a href="/read">/read</a></strong>: Reads the contents of the file <code>file.txt</code> and displays it on the screen.</li>
+                <li><strong><a href="/read/file.txt">/read</a></strong>: Reads the contents of the file <code>file.txt</code> and displays it on the screen.</li>
             </ul>
         `);
         res.end();
