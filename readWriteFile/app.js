@@ -7,6 +7,7 @@ const {
     formatTextFile
 } = require('./modules/utils.js');
 const path = require('path');
+const port = process.env.PORT || 3000;
 let myPath = path.join(__dirname, 'file.txt');
 
 //Write
