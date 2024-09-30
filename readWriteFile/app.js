@@ -41,7 +41,6 @@ http.createServer(function (req, res) {
         }
         res.end();
 
-    // Default response for the root path or other paths without parameters
     } else {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.write(`
