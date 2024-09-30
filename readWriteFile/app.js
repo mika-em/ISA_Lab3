@@ -7,23 +7,26 @@ const {
     formatTextFile
 } = require('./modules/utils.js');
 const path = require('path');
-const port = process.env.PORT || 3000;
 const fs = require('fs');
-let myPath = path.join(__dirname, 'file.txt');
 
-//Write
+const port = process.env.PORT || 3000;
+const myPath = path.join(__dirname, 'file.txt');
+
 http.createServer(async function (req, res) {
     const myURL = new URL(req.url, `http://${req.headers.host}`);
 
+    // Handle writing to the file
     if (myURL.searchParams.has("text")) {
         const text = myURL.searchParams.get("text");
         try {
+            // Check if the file exists
             if (!fs.existsSync(myPath)) {
                 return res.writeHead(404, {
                     'Content-Type': 'text/html'
                 }).end("File not found");
             }
 
+            // Append text to the file and handle errors
             fs.appendFile(myPath, `\n${text}`, (err) => {
                 if (err) {
                     handleError(res, '500', err.message);
@@ -33,24 +36,28 @@ http.createServer(async function (req, res) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 });
-
                 res.write(`File updated. "${text}" appended to file ${myPath}.`);
+                res.end();
             });
         } catch (err) {
             handleError(res, '500', err.message);
+            res.end();
         }
-        res.end();
 
-        //Read
+        // Handle reading the file
     } else if (myURL.pathname.startsWith("/read/")) {
-        const requestedFileName = path.basename(pathname);
+        const requestedFileName = path.basename(myURL.pathname); // Fixed typo: used myURL.pathname instead of pathname
         const requestedFilePath = path.join(__dirname, requestedFileName);
+
         try {
+            // Check if the requested file exists
             if (!fs.existsSync(requestedFilePath)) {
                 return res.writeHead(404, {
                     'Content-Type': 'text/html'
-                }).end(` ${requestedFileName} does not exist or is not found`);
+                }).end(`${requestedFileName} does not exist or is not found`);
             }
+
+            // Read and format the file contents
             const text = fs.readFileSync(requestedFilePath, 'utf-8');
             const formattedText = formatTextFile(text);
             res.writeHead(200, {
@@ -62,6 +69,7 @@ http.createServer(async function (req, res) {
         }
         res.end();
 
+        // Handle default route with forms
     } else {
         res.writeHead(200, {
             'Content-Type': 'text/html'
@@ -77,7 +85,7 @@ http.createServer(async function (req, res) {
 
             <h2>Enter the file you want to find</h2>
             <form action="/read" method="GET">
-                <label for="text">File to search (make sure to include the extension):</label>
+                <label for="file">File to search (make sure to include the extension):</label>
                 <input type="text" id="file" name="file" required>
                 <button type="submit">Submit</button>
             </form>
@@ -86,9 +94,11 @@ http.createServer(async function (req, res) {
             <p>Or use the following endpoints:</p>
             <ul>
                 <li><strong>/?text=YourTextHere</strong>: Appends the specified text to the file <code>file.txt</code>.</li>
-                <li><strong><a href="/read/file.txt">/read</a></strong>: Reads the contents of the file <code>file.txt</code> and displays it on the screen.</li>
+                <li><strong><a href="/read/file.txt">/read/file.txt</a></strong>: Reads the contents of the file <code>file.txt</code> and displays it on the screen.</li>
             </ul>
         `);
         res.end();
     }
-}).listen(port);
+}).listen(port, () => {
+    console.log(`Server running at http://localhost:${port}/`);
+});
