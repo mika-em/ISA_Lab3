@@ -12,8 +12,7 @@ const port = process.env.PORT || 3000;
 
 http.createServer(function (req, res) {
     const myURL = new URL(req.url, `https://${req.headers.host}`);
-    const path = "text.txt"
-
+    const path = "/tmp/text.txt";
 
     if (myURL.searchParams.has("text")) {
         const text = myURL.searchParams.get("text");
