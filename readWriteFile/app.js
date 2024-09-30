@@ -6,75 +6,52 @@ const {
     handleError,
     formatTextFile
 } = require('./modules/utils.js');
-const {
-    initializeApp
-} = require('firebase/app');
-const {
-    getDatabase,
-    ref,
-    get,
-    set,
-    update,
-    child
-} = require('firebase/database');
-const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-    databaseURL: process.env.NEXT_PUBLIC_DATABASE_URL,
-    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_APP_ID,
-};
 
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+let path = path.join(__dirname, 'file.txt');
 
-const port = process.env.PORT || 3000;
-const filePath = 'file.txt';
-
+//Write
 http.createServer(async function (req, res) {
     const myURL = new URL(req.url, `http://${req.headers.host}`);
     if (myURL.searchParams.has("text")) {
         const text = myURL.searchParams.get("text");
         try {
-            const fileRef = ref(database, filePath);
-            const snapshot = await get(fileRef);
-            let currentContent = snapshot.exists() ? snapshot.val() : '';
-            const newContent = `${currentContent}\n${text}`;
-            await set(fileRef, newContent);
+            if (!fs.existsSync(repoFilePath)) {
+                return res.writeHead(404, {
+                    'Content-Type': 'text/html'
+                }).end("File not found");
+            }
 
+            fs.appendFileSync(path, text);
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
+
             res.write(`File updated. "${text}" appended to file.`);
         } catch (err) {
             handleError(res, '500', err.message);
         }
         res.end();
 
-    } else if (myURL.pathname === "/read") {
+    } else if (myURL.pathname.startsWith("/read/")) {
+        const fileName = path.basename(pathname);
+        const possibleFilePath = path.join(__dirname, fileName);
         try {
-            const fileRef = ref(database, filePath);
-            const snapshot = await get(fileRef);
-
-            if (snapshot.exists()) {
-                const text = snapshot.val();
-                const formattedText = formatTextFile(text);
-                res.writeHead(200, {
+            if (!fs.existsSync(possibleFilePath)) {
+                return res.writeHead(404, {
                     'Content-Type': 'text/html'
-                });
-                res.write(formattedText);
-            } else {
-                res.writeHead(404, {
-                    'Content-Type': 'text/html'
-                });
-                res.write("File does not exist yet. Add some text first.");
+                }).end(` ${fileName} does not exist or is not found`);
             }
+            const text = fs.readFileSync(possibleFilePath, 'utf-8');
+                const formattedText = formatTextFile(text);
+            res.writeHead(200, {
+                'Content-Type': 'text/html'
+            });
+            res.write(formattedText);
         } catch (err) {
             handleError(res, '500', err.message);
         }
         res.end();
+
     } else {
         res.writeHead(200, {
             'Content-Type': 'text/html'
