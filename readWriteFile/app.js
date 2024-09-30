@@ -59,8 +59,27 @@ http.createServer(async function (req, res) {
         }
         res.end();
 
-        // Handle default route with forms
+
+    } else if (myURL.pathname === "/view-file") {
+        try {
+            if (!fs.existsSync(myPath)) {
+                return res.writeHead(404, {
+                    'Content-Type': 'text/html'
+                }).end("file.txt does not exist or is not found in /tmp");
+            }
+
+            const fileContents = fs.readFileSync(myPath, 'utf-8');
+            res.writeHead(200, {
+                'Content-Type': 'text/html'
+            });
+            res.write(`<h2>Contents of file.txt:</h2><pre>${fileContents}</pre>`);
+            res.end();
+        } catch (err) {
+            handleError(res, '500', err.message);
+            res.end();
+        }
     } else {
+
         res.writeHead(200, {
             'Content-Type': 'text/html'
         });
