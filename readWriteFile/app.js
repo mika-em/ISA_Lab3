@@ -24,20 +24,24 @@ http.createServer(async function (req, res) {
                 }).end("File not found");
             }
 
-            fs.appendFile(myPath, text), (err) => {
-                if (err) throw err;
-            };
-            res.writeHead(200, {
-                'Content-Type': 'text/html'
-            });
+            fs.appendFile(myPath, `\n${text}`, (err) => {
+                if (err) {
+                    handleError(res, '500', err.message);
+                    return;
+                }
 
-            res.write(`File updated. "${text}" appended to file ${myPath}.`);
+                res.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
+
+                res.write(`File updated. "${text}" appended to file ${myPath}.`);
+            });
         } catch (err) {
             handleError(res, '500', err.message);
         }
         res.end();
 
-//Read
+        //Read
     } else if (myURL.pathname.startsWith("/read/")) {
         const requestedFileName = path.basename(pathname);
         const requestedFilePath = path.join(__dirname, requestedFileName);
