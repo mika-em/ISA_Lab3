@@ -92,15 +92,15 @@ http.createServer(async function (req, res) {
             </form>
             <br>
 
-            <h2>Enter the file you want to find</h2>
-            <form action="/read" method="GET">
-                <label for="file">File to search (make sure to include the extension):</label>
-                <input type="text" id="file" name="file" required>
-                <button type="submit">Submit</button>
-            </form>
-            <br>
+<h2>Enter the file you want to find</h2>
+<form id="searchForm" method="GET">
+    <label for="file">File to search (make sure to include the extension):</label>
+    <input type="text" id="file" name="file" required>
+    <button type="submit" onclick="this.form.action = '/read/' + encodeURIComponent(document.getElementById('file').value);">Submit</button>
+</form>
+<br>
 
-             <h2>View Contents of file.txt</h2>
+        <h2>View Contents of file.txt</h2>
             <p>Click <a href="/view-file">here</a> to view the contents of <code>file.txt</code> in the /tmp directory.</p>
             <p>Or use the following endpoints:</p>
             <ul>
