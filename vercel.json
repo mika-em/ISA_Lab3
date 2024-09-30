@@ -1,9 +1,6 @@
 {
-    "projects": {
-        "getDate": {
-            "rootDirectory": "getDate",
-            "buildCommand": "npm install && npm run build",
-            "outputDirectory": "build"
-        }
-    }
+    "rewrites": [{
+        "source": "lab3/getDate",
+        "destination": "/getDate/server.js"
+    }]
 }
