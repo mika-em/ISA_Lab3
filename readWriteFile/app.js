@@ -100,8 +100,11 @@ http.createServer(async function (req, res) {
             </form>
             <br>
 
+             <h2>View Contents of file.txt</h2>
+            <p>Click <a href="/view-file">here</a> to view the contents of <code>file.txt</code> in the /tmp directory.</p>
             <p>Or use the following endpoints:</p>
             <ul>
+            
                 <li><strong>/?text=YourTextHere</strong>: Appends the specified text to the file <code>file.txt</code>.</li>
                 <li><strong><a href="/read/file.txt">/read/file.txt</a></strong>: Reads the contents of the file <code>file.txt</code> and displays it on the screen.</li>
             </ul>
