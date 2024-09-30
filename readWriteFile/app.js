@@ -24,7 +24,9 @@ http.createServer(async function (req, res) {
                 }).end("File not found");
             }
 
-            fs.appendFile(myPath, text);
+            fs.appendFile(myPath, text), (err) => {
+                if (err) throw err;
+            };
             res.writeHead(200, {
                 'Content-Type': 'text/html'
             });
