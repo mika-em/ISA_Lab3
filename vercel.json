@@ -1,6 +1,11 @@
 {
-    "rewrites": [{
-        "source": "lab3/getDate",
-        "destination": "/getDate/server.js"
+    "version": 2,
+    "builds": [{
+        "src": "getDate/server.js",
+        "use": "@vercel/node"
+    }],
+    "routes": [{
+        "src": "/(.*)",
+        "dest": "getDate/server.js"
     }]
 }
