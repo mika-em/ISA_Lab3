@@ -6,7 +6,7 @@ const {
     handleError,
     formatTextFile
 } = require('./modules/utils.js');
-
+const path = require('path');
 let path = path.join(__dirname, 'file.txt');
 
 //Write
