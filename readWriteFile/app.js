@@ -28,7 +28,7 @@ http.createServer(async function (req, res) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 });
-                res.write(`File updated. "${text}" appended to file at path ${myPath}.`);
+                res.write(`File updated. "${text}" appended to file.txt`);
                 res.end();
             });
         } catch (err) {
@@ -38,8 +38,8 @@ http.createServer(async function (req, res) {
 
         // Handle reading the file
     } else if (myURL.pathname.startsWith("/read/")) {
-        const requestedFileName = path.basename(myURL.pathname); // Fixed typo: used myURL.pathname instead of pathname
-        const requestedFilePath = path.join('/tmp', requestedFileName); // Use /tmp directory
+        const requestedFileName = path.basename(myURL.pathname);
+        const requestedFilePath = path.join('/tmp', requestedFileName);
 
         try {
             if (!fs.existsSync(requestedFilePath)) {
